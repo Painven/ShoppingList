@@ -20,6 +20,8 @@
         </Grid.ColumnDefinitions>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
         <TextBlock
@@ -49,5 +51,75 @@
                 Foreground="DarkGray"
                 Kind="Folder" />
         </Button>
+
+        <Button
+            Grid.Row="1"
+            Grid.ColumnSpan="3"
+            Margin="4"
+            Padding="8"
+            HorizontalAlignment="Center"
+            Background="#333"
+            Command="{Binding LoadLastListCommand}"
+            FontWeight="Bold"
+            Foreground="White">
+            <icons:MaterialDesign Kind="FileDownload" />
+        </Button>
+        <Grid
+            Grid.Row="2"
+            Grid.ColumnSpan="3"
+            Background="#333"
+            DataContext="{Binding LoadedList}">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel.Resources>
+                    <Style TargetType="Label">
+                        <Setter Property="Foreground" Value="RoyalBlue" />
+                        <Setter Property="Margin" Value="0,4,8,4" />
+                    </Style>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Foreground" Value="White" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="0,4,20,4" />
+
+                    </Style>
+                </StackPanel.Resources>
+
+                <Label>Имя файла</Label>
+                <TextBlock Text="{Binding FileName, FallbackValue='123.txt'}" />
+
+                <Label>Дата создания</Label>
+                <TextBlock Text="{Binding Created, StringFormat='dd.MM.yyyy H:mm', FallbackValue='01.01.2000 00:00:00', ConverterCulture=ru-RU}" />
+
+                <Label>Дата изменения</Label>
+                <TextBlock Text="{Binding Modified, StringFormat='dd.MM.yyyy H:mm', FallbackValue='01.01.2000 00:00:00', ConverterCulture=ru-RU}" />
+            </StackPanel>
+            <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <CheckBox
+                                Grid.Column="0"
+                                Margin="8,8,2,2"
+                                VerticalAlignment="Center"
+                                IsChecked="{Binding IsComplete}" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Margin="8,2,2,2"
+                                VerticalAlignment="Center"
+                                FontSize="20"
+                                Foreground="Yellow"
+                                Text="{Binding Name}" />
+                        </Grid>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </Grid>
     </Grid>
 </Window>

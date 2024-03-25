@@ -10,33 +10,45 @@ public class ShoppingListApiClient
         this.client = client;
     }
 
-    public async Task SendFile(string filePath)
+    public async Task SendFile(ShoppingListFileTransferData data)
     {
-        var fi = new FileInfo(filePath);
-        var fileId = filePath.GenerateFileId();
-        var lines = File.ReadAllLines(filePath)
-            .Where(line => !string.IsNullOrWhiteSpace(line))
-            .ToArray();
-
-        if (lines.Length == 0)
+        try
         {
-            return;
+            await client.PostAsJsonAsync("/add-from-file", data);
         }
-
-        var data = new ShoppingListFileTransferData()
+        catch
         {
-            Created = fi.CreationTimeUtc,
-            Modified = fi.LastWriteTimeUtc,
-            FileId = fileId,
-            FileName = Path.GetFileName(filePath),
-            Items = lines.Select(line => new ShoppingListItem()
+
+        }
+    }
+
+    public async Task<ShoppingListFileTransferData> GetLast()
+    {
+        try
+        {
+            var data = await client.GetFromJsonAsync<ShoppingListFileTransferData>("/shop-list");
+            return data;
+        }
+        catch
+        {
+            return new ShoppingListFileTransferData();
+        }
+    }
+
+    public async Task SetCompleteStatus(string fileId, string name, bool newStatus)
+    {
+        try
+        {
+            var data = new ShoppingListItem()
             {
-                Name = line.Substring(4).Trim(),
-                IsComplete = line[1] == '+' ? true : false,
-            }).ToArray()
-        };
+                Name = name,
+                IsComplete = newStatus,
+            };
+            var result = await client.PutAsJsonAsync($"/set-item-state/{fileId}", data);
+        }
+        catch
+        {
 
-
-        await client.PostAsJsonAsync("/add-from-file", data);
+        }
     }
 }

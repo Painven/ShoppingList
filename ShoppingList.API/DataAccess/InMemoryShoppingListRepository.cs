@@ -13,11 +13,11 @@ public class InMemoryShoppingListRepository : IShoppingListRepository
         list.Add(data);
     }
 
-    public async Task<ShoppingListFileTransferData> GetLastShoppingList()
+    public async Task<ShoppingListFileTransferData?> GetLastShoppingList()
     {
         await Task.Yield();
 
-        return list.Last();
+        return list.LastOrDefault();
     }
 
     public async Task SetItemState(string fileId, string itemName, bool newState)

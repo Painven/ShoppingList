@@ -1,6 +1,8 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using ShoppingList.Core;
+using ShoppingList.Core.Interfaces;
+using ShoppingList.Desktop.BL;
 using ShoppingList.Desktop.ViewModels;
 using System.Windows;
 
@@ -21,6 +23,7 @@ public partial class App : Application
                 {
                     x.BaseAddress = new Uri("http://localhost:8847");
                 });
+                services.AddSingleton<IShopListFileParser, ShopListTxtFileParser>();
                 services.AddSingleton<MainWindowViewModel>();
                 services.AddSingleton<MainWindow>(x => new MainWindow()
                 {

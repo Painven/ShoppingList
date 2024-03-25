@@ -1,12 +1,19 @@
+using Microsoft.AspNetCore.HttpLogging;
 using Microsoft.AspNetCore.Mvc;
 using ShoppingList.API.DataAccess;
 using ShoppingList.Core;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddHttpLogging(logging =>
+ {
+     logging.LoggingFields = HttpLoggingFields.All;
+ });
+
 builder.Services.AddSingleton<IShoppingListRepository, InMemoryShoppingListRepository>();
 
 var app = builder.Build();
+app.UseHttpLogging();
 
 app.MapPost("/add-from-file", async ([FromServices] IShoppingListRepository repo, [FromBody] ShoppingListFileTransferData file) =>
 {

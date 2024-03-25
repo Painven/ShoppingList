@@ -11,7 +11,6 @@ public class WorkingFolderWatcher
     {
         watcher = new FileSystemWatcher();
         watcher.Changed += Watcher_Changed;
-        watcher.Created += Watcher_Changed;
     }
 
     public void Watch(string folder)
