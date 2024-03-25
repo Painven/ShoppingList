@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using ShoppingList.Core;
 using ShoppingList.Desktop.ViewModels;
 using System.Windows;
 
@@ -14,9 +15,12 @@ public partial class App : Application
     public App()
     {
         host = Host.CreateDefaultBuilder()
-            // внедряем сервисы
             .ConfigureServices(services =>
             {
+                services.AddHttpClient<ShoppingListApiClient>(x =>
+                {
+                    x.BaseAddress = new Uri("http://localhost:8847");
+                });
                 services.AddSingleton<MainWindowViewModel>();
                 services.AddSingleton<MainWindow>(x => new MainWindow()
                 {
