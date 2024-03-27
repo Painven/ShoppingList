@@ -22,8 +22,15 @@ public class WorkingFolderWatcher
         }
     }
 
+    public void StopForActionAndContinue(Action action)
+    {
+        watcher.EnableRaisingEvents = false;
+        action();
+        watcher.EnableRaisingEvents = true;
+    }
+
     private void Watcher_Changed(object sender, FileSystemEventArgs e)
     {
-        FileChanged?.Invoke(e.FullPath);
+        StopForActionAndContinue(() => FileChanged?.Invoke(e.FullPath));
     }
 }

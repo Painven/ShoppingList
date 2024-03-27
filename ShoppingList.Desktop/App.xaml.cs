@@ -17,12 +17,10 @@ public partial class App : Application
     public App()
     {
         host = Host.CreateDefaultBuilder()
-            .ConfigureServices(services =>
+            .ConfigureServices((context, services) =>
             {
-                services.AddHttpClient<ShoppingListApiClient>(x =>
-                {
-                    x.BaseAddress = new Uri("http://localhost:8847");
-                });
+                services.Configure<ApiEndpointConfiguration>(context.Configuration.GetSection(nameof(ApiEndpointConfiguration)));
+                services.AddHttpClient<ShoppingListApiClient>();
                 services.AddSingleton<IShopListFileParser, ShopListTxtFileParser>();
                 services.AddSingleton<MainWindowViewModel>();
                 services.AddSingleton<MainWindow>(x => new MainWindow()

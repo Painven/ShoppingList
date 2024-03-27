@@ -35,4 +35,18 @@ public class ShopListTxtFileParser : IShopListFileParser
         return data;
 
     }
+
+    public void SaveDataToLocalFile(string workingFolder, ShoppingListFileTransferData data)
+    {
+        var filePath = Path.Combine(workingFolder, data.FileName);
+
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException("Файл не найден", filePath);
+        }
+
+        var lines = data.Items.Select(item => $"[{(item.IsComplete ? "+" : "-")}] {item.Name}").ToArray();
+
+        File.WriteAllLines(filePath, lines);
+    }
 }

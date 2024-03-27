@@ -1,5 +1,4 @@
-﻿using CommunityToolkit.Mvvm.ComponentModel;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 
 namespace ShoppingList.Desktop.Models;
 
@@ -11,12 +10,4 @@ public class ShoppingListCollection
     public DateTime Modified { get; init; }
 
     public ObservableCollection<ShoppingListItemViewModel> Items { get; init; } = new();
-}
-
-public partial class ShoppingListItemViewModel : ObservableObject
-{
-    public string Name { get; init; } = "<Без имени>";
-
-    [ObservableProperty]
-    private bool isComplete;
 }

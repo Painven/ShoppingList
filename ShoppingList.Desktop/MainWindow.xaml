@@ -39,6 +39,8 @@
             VerticalAlignment="Top"
             IsReadOnly="True"
             Text="{Binding WatchingFolder}" />
+
+
         <Button
             Grid.Row="0"
             Grid.Column="2"
@@ -52,18 +54,34 @@
                 Kind="Folder" />
         </Button>
 
-        <Button
+        <StackPanel
             Grid.Row="1"
             Grid.ColumnSpan="3"
-            Margin="4"
-            Padding="8"
             HorizontalAlignment="Center"
-            Background="#333"
-            Command="{Binding LoadLastListCommand}"
-            FontWeight="Bold"
-            Foreground="White">
-            <icons:MaterialDesign Kind="FileDownload" />
-        </Button>
+            Orientation="Horizontal">
+            <Button
+                Margin="4"
+                Padding="8"
+                HorizontalAlignment="Center"
+                Background="#333"
+                Command="{Binding LoadLastListCommand}"
+                FontWeight="Bold"
+                Foreground="White">
+                <icons:MaterialDesign Kind="FileDownload" />
+            </Button>
+            <Button
+                Margin="4"
+                Padding="8"
+                HorizontalAlignment="Center"
+                Background="#333"
+                Command="{Binding ChangeLocalFileCommand}"
+                FontWeight="Bold"
+                Foreground="White">
+                <icons:MaterialDesign Kind="FileUpload" />
+            </Button>
+        </StackPanel>
+
+
         <Grid
             Grid.Row="2"
             Grid.ColumnSpan="3"

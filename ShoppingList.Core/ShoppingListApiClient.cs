@@ -1,13 +1,16 @@
-﻿using System.Net.Http.Json;
+﻿using Microsoft.Extensions.Options;
+using System.Net.Http.Json;
 
 namespace ShoppingList.Core;
 public class ShoppingListApiClient
 {
     private readonly HttpClient client;
 
-    public ShoppingListApiClient(HttpClient client)
+    public ShoppingListApiClient(HttpClient client, IOptions<ApiEndpointConfiguration> options)
     {
         this.client = client;
+        client.BaseAddress = new Uri(options.Value.Host);
+        client.DefaultRequestHeaders.Add("Authorization", options.Value.Token);
     }
 
     public async Task SendFile(ShoppingListFileTransferData data)

@@ -1,0 +1,54 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    x:Class="ShoppingListMobile.MainPage"
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    xmlns:conv="clr-namespace:ShoppingListMobile.Converters"
+    xmlns:model="clr-namespace:ShoppingListMobile.Models"
+    xmlns:vm="clr-namespace:ShoppingListMobile.ViewModels"
+    Title="Список покупок"
+    x:DataType="{x:Type vm:MainPageViewModel}">
+    <ContentPage.Resources>
+        <conv:TextDecorationStrikethroughConverter x:Key="TextDecorationStrikethroughConverter" />
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30,0" Spacing="25">
+            <Button Command="{Binding LoadLastListCommand}" Text="Загрузить последний список" />
+            <Label
+                FontSize="14"
+                Text="{Binding StatusString}"
+                TextColor="#333" />
+            <CollectionView ItemsSource="{Binding LastList.Items}">
+                <CollectionView.ItemTemplate>
+                    <DataTemplate x:DataType="{x:Type model:ShoppingListItemViewModel}">
+                        <Border
+                            Margin="2"
+                            Padding="2"
+                            Background="#333"
+                            StrokeThickness="2">
+                            <Border.StrokeShape>
+                                <RoundRectangle CornerRadius="8,8,8,8" />
+                            </Border.StrokeShape>
+
+                            <Grid ColumnDefinitions="Auto, *">
+                                <CheckBox
+                                    Grid.Column="0"
+                                    IsChecked="{Binding IsCompleted}"
+                                    Color="GreenYellow" />
+                                <Label
+                                    Grid.Column="1"
+                                    FontSize="20"
+                                    Text="{Binding Name}"
+                                    TextColor="Yellow"
+                                    TextDecorations="{Binding IsCompleted, Converter={StaticResource TextDecorationStrikethroughConverter}}"
+                                    VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentPage>

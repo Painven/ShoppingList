@@ -17,11 +17,22 @@ public partial class MainWindowViewModel : ObservableObject
     private readonly ShoppingListApiClient apiClient;
     private readonly IShopListFileParser parser;
 
+    [NotifyCanExecuteChangedFor(nameof(ChangeLocalFileCommand))]
     [ObservableProperty]
     private ShoppingListCollection loadedList;
 
     [ObservableProperty]
     private string watchingFolder;
+
+    [NotifyPropertyChangedFor(nameof(IsNotBusy))]
+    [NotifyPropertyChangedFor(nameof(CanChangeLocalFile))]
+    [NotifyCanExecuteChangedFor(nameof(ChangeLocalFileCommand))]
+    [ObservableProperty]
+    private bool isBusy = false;
+
+    private bool IsNotBusy => !IsBusy;
+
+    private bool CanChangeLocalFile => !IsBusy && LoadedList != null;
 
     [ObservableProperty]
     private string title = "Список покупок";
@@ -45,6 +56,8 @@ public partial class MainWindowViewModel : ObservableObject
         {
             var data = parser.ParseFile(filePath);
             await apiClient.SendFile(data);
+
+            await Application.Current.Dispatcher.InvokeAsync(async () => await LoadLastList());
         }
     }
 
@@ -63,33 +76,72 @@ public partial class MainWindowViewModel : ObservableObject
         };
     }
 
-    [RelayCommand]
+    [RelayCommand(CanExecute = nameof(IsNotBusy))]
     private async Task LoadLastList()
     {
-        var data = await apiClient.GetLast();
-
-        LoadedList = new ShoppingListCollection()
+        try
         {
-            Created = data.Created,
-            FileId = data.FileId,
-            FileName = data.FileName,
-            Modified = data.Modified,
-            Items = new ObservableCollection<ShoppingListItemViewModel>(data.Items.Select(i => new ShoppingListItemViewModel()
-            {
-                Name = i.Name,
-                IsComplete = i.IsComplete,
-            }))
-        };
+            IsBusy = true;
 
-        LoadedList.Items.ToList().ForEach(i =>
-        {
-            i.PropertyChanged += async (o, e) =>
+            var data = await apiClient.GetLast();
+
+            LoadedList = new ShoppingListCollection()
             {
-                if (e.PropertyName == nameof(ShoppingListItemViewModel.IsComplete))
+                Created = data.Created,
+                FileId = data.FileId,
+                FileName = data.FileName,
+                Modified = data.Modified,
+                Items = new ObservableCollection<ShoppingListItemViewModel>(data.Items.Select(i => new ShoppingListItemViewModel()
                 {
-                    await apiClient.SetCompleteStatus(data.FileId, i.Name, i.IsComplete);
-                }
+                    Name = i.Name,
+                    IsComplete = i.IsComplete,
+                }))
             };
-        });
+
+            LoadedList.Items.ToList().ForEach(i =>
+            {
+                i.PropertyChanged += async (o, e) =>
+                {
+                    try
+                    {
+                        IsBusy = true;
+
+                        await apiClient.SetCompleteStatus(data.FileId, i.Name, i.IsComplete);
+                    }
+                    finally
+                    {
+                        IsBusy = false;
+                    }
+                };
+            });
+        }
+        finally
+        {
+            IsBusy = false;
+        }
+    }
+
+    [RelayCommand(CanExecute = nameof(CanChangeLocalFile))]
+    private void ChangeLocalFile()
+    {
+        var saveDialog = MessageBox.Show($"Сохранить данные в файл '{LoadedList.FileName}' в папке [{WatchingFolder}] ? ", "Подтверждение", MessageBoxButton.YesNoCancel, MessageBoxImage.Question);
+
+        if (saveDialog == MessageBoxResult.Yes)
+        {
+            var data = new ShoppingListFileTransferData()
+            {
+                FileName = LoadedList.FileName,
+                Items = LoadedList.Items.Select(item => new ShoppingListItem()
+                {
+                    Name = item.Name,
+                    IsComplete = item.IsComplete
+                }).ToArray()
+            };
+
+            watcher.StopForActionAndContinue(() =>
+            {
+                parser.SaveDataToLocalFile(WatchingFolder, data);
+            });
+        }
     }
 }
