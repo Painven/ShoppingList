@@ -12,6 +12,7 @@
     d:DataContext="{d:DesignInstance vm:MainWindowViewModel,
                                      IsDesignTimeCreatable=True}"
     mc:Ignorable="d">
+
     <Grid>
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
@@ -92,52 +93,45 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <StackPanel Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <Style TargetType="Label">
-                        <Setter Property="Foreground" Value="RoyalBlue" />
-                        <Setter Property="Margin" Value="0,4,8,4" />
-                    </Style>
-                    <Style TargetType="TextBlock">
-                        <Setter Property="Foreground" Value="White" />
-                        <Setter Property="VerticalAlignment" Value="Center" />
-                        <Setter Property="Margin" Value="0,4,20,4" />
+                <Label Style="{StaticResource TitleLabelStyle}">Имя файла</Label>
+                <TextBlock Style="{StaticResource DataTextBlockStyle}" Text="{Binding FileName, FallbackValue='123.txt'}" />
 
-                    </Style>
-                </StackPanel.Resources>
+                <Label Style="{StaticResource TitleLabelStyle}">Дата создания</Label>
+                <TextBlock Style="{StaticResource DataTextBlockStyle}" Text="{Binding Created, StringFormat='dd.MM.yyyy H:mm', FallbackValue='01.01.2000 00:00:00', ConverterCulture=ru-RU}" />
 
-                <Label>Имя файла</Label>
-                <TextBlock Text="{Binding FileName, FallbackValue='123.txt'}" />
-
-                <Label>Дата создания</Label>
-                <TextBlock Text="{Binding Created, StringFormat='dd.MM.yyyy H:mm', FallbackValue='01.01.2000 00:00:00', ConverterCulture=ru-RU}" />
-
-                <Label>Дата изменения</Label>
-                <TextBlock Text="{Binding Modified, StringFormat='dd.MM.yyyy H:mm', FallbackValue='01.01.2000 00:00:00', ConverterCulture=ru-RU}" />
+                <Label Style="{StaticResource TitleLabelStyle}">Дата изменения</Label>
+                <TextBlock Style="{StaticResource DataTextBlockStyle}" Text="{Binding Modified, StringFormat='dd.MM.yyyy H:mm', FallbackValue='01.01.2000 00:00:00', ConverterCulture=ru-RU}" />
             </StackPanel>
-            <ItemsControl Grid.Row="1" ItemsSource="{Binding Items}">
-                <ItemsControl.ItemTemplate>
-                    <DataTemplate>
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto" />
-                                <ColumnDefinition Width="*" />
-                            </Grid.ColumnDefinitions>
-                            <CheckBox
-                                Grid.Column="0"
-                                Margin="8,8,2,2"
-                                VerticalAlignment="Center"
-                                IsChecked="{Binding IsComplete}" />
-                            <TextBlock
-                                Grid.Column="1"
-                                Margin="8,2,2,2"
-                                VerticalAlignment="Center"
-                                FontSize="20"
-                                Foreground="Yellow"
-                                Text="{Binding Name}" />
-                        </Grid>
-                    </DataTemplate>
-                </ItemsControl.ItemTemplate>
-            </ItemsControl>
+            <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                <ItemsControl ItemsSource="{Binding Items}">
+                    <ItemsControl.ItemTemplate>
+                        <DataTemplate>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+                                <Button Command="{Binding ToggleCompleteCommand}" Style="{StaticResource TransaprentButtonStyle}" Margin="8 2 4 2" VerticalAlignment="Center">
+                                    <icons:PackIconMaterial
+                                        Width="32"
+                                        Foreground="{Binding IsComplete, Converter={StaticResource BoolToCheckedStatusColorConverter}}"
+                                        Kind="{Binding IsComplete, Converter={StaticResource BoolToCheckedStatusIconConverter}}" />
+                                </Button>
+
+                                <TextBlock
+                                    Grid.Column="1"
+                                    Margin="8,2,2,2"
+                                    VerticalAlignment="Center"
+                                    FontSize="20"
+                                    Foreground="Yellow"
+                                    Text="{Binding Name}"
+                                    TextDecorations="{Binding IsComplete, Converter={StaticResource TextDecorationStrikethroughConverter}}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                </ItemsControl>
+            </ScrollViewer>
+
         </Grid>
     </Grid>
 </Window>
